@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promise Boat - Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f9;
+      color: #17324d;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .box {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccd6df;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      background: #17324d;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div class="box" id="loginBox">
+    <h1>Promise Boat</h1>
+    <h2>Admin Login</h2>
+
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="Email">
+
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <div id="loginMessage"></div>
+  </div>
+
+
+  <!-- ADMIN -->
+  <div class="box hidden" id="adminBox">
+
+    <h1>Promise Boat Admin</h1>
+
+    <button onclick="logout()">Logout</button>
+
+    <h2>Add New Boat</h2>
+
+    <label>اسم المركب بالعربي</label>
+    <input id="nameAr" type="text">
+
+    <label>Boat name in English</label>
+    <input id="nameEn" type="text">
+
+    <label>الوصف بالعربي</label>
+    <textarea id="descriptionAr"></textarea>
+
+    <label>Description in English</label>
+    <textarea id="descriptionEn"></textarea>
+
+    <label>السعر</label>
+    <input id="price" type="number">
+
+    <label>الطول بالقدم</label>
+    <input id="lengthFt" type="number">
+
+    <label>عدد الأشخاص</label>
+    <input id="capacity" type="number">
+
+    <label>صور وفيديو المركب</label>
+    <input
+      id="mediaFiles"
+      type="file"
+      accept="image/*,video/*"
+      multiple
+    >
+
+    <button onclick="addBoat()">Add Boat</button>
+
+    <div id="result"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  const SUPABASE_URL =
+    "https://zsidomhwdshqsumxgamr.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_73bsUKM0l9Q7Raw-ooRnpA_xWMca_nx";
+
+  const supabaseClient =
+    supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+  // =========================
+  // LOGIN
+  // =========================
+
+  async function login() {
+
+    const email =
+      document.getElementById("loginEmail").value.trim();
+
+    const password =
+      document.getElementById("loginPassword").value;
+
+    const message =
+      document.getElementById("loginMessage");
+
+    message.innerHTML = "";
+
+    if (!email || !password) {
+      message.innerHTML =
+        '<div class="message">اكتبي الإيميل والباسورد.</div>';
+      return;
+    }
+
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+    if (error) {
+      message.innerHTML =
+        '<div class="message">' +
+        error.message +
+        '</div>';
+      return;
+    }
+
+    showAdmin();
+
+  }
+
+
+  // =========================
+  // SHOW ADMIN
+  // =========================
+
+  function showAdmin() {
+
+    document
+      .getElementById("loginBox")
+      .classList.add("hidden");
+
+    document
+      .getElementById("adminBox")
+      .classList.remove("hidden");
+
+  }
+
+
+  // =========================
+  // LOGOUT
+  // =========================
+
+  async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    document
+      .getElementById("adminBox")
+      .classList.add("hidden");
+
+    document
+      .getElementById("loginBox")
+      .classList.remove("hidden");
+
+  }
+
+
+  // =========================
+  // CHECK SESSION
+  // =========================
+
+  async function checkSession() {
+
+    const {
+      data: { session }
+    } = await supabaseClient.auth.getSession();
+
+    if (session) {
+      showAdmin();
+    }
+
+  }
+
+
+  // =========================
+  // ADD BOAT
+  // =========================
+
+  async function addBoat() {
+
+    const result =
+      document.getElementById("result");
+
+    result.innerHTML =
+      '<div class="message">جاري الحفظ...</div>';
+
+    const nameAr =
+      document.getElementById("nameAr").value.trim();
+
+    const nameEn =
+      document.getElementById("nameEn").value.trim();
+
+    const descriptionAr =
+      document.getElementById("descriptionAr").value.trim();
+
+    const descriptionEn =
+      document.getElementById("descriptionEn").value.trim();
+
+    const price =
+      document.getElementById("price").value;
+
+    const lengthFt =
+      document.getElementById("lengthFt").value;
+
+    const capacity =
+      document.getElementById("capacity").value;
+
+    const files =
+      document.getElementById("mediaFiles").files;
+
+
+    if (!nameAr || !nameEn) {
+
+      result.innerHTML =
+        '<div class="message">اكتبي اسم المركب بالعربي والإنجليزي.</div>';
+
+      return;
+    }
+
+
+    // -------------------------
+    // ADD BOAT
+    // -------------------------
+
+    const { data: boat, error: boatError } =
+      await supabaseClient
+        .from("boats")
+        .insert({
+          name_ar: nameAr,
+          name_en: nameEn,
+          description_ar: descriptionAr,
+          description_en: descriptionEn,
+          price: price ? Number(price) : null,
+          length_ft: lengthFt ? Number(lengthFt) : null,
+          capacity: capacity ? Number(capacity) : null
+        })
+        .select()
+        .single();
+
+
+    if (boatError) {
+
+      result.innerHTML =
+        '<div class="message">خطأ في إضافة المركب:\n' +
+        boatError.message +
+        '</div>';
+
+      return;
+    }
+
+
+    // -------------------------
+    // UPLOAD MEDIA
+    // -------------------------
+
+    for (let i = 0; i < files.length; i++) {
+
+      const file = files[i];
+
+      const safeName =
+        Date.now() +
+        "_" +
+        i +
+        "_" +
+        file.name.replace(/\s+/g, "_");
+
+      const filePath =
+        boat.id + "/" + safeName;
+
+
+      const { error: uploadError } =
+        await supabaseClient
+          .storage
+          .from("boat-media")
+          .upload(filePath, file);
+
+
+      if (uploadError) {
+
+        result.innerHTML =
+          '<div class="message">المركب اتضاف، لكن حصل خطأ أثناء رفع الملف:\n' +
+          uploadError.message +
+          '</div>';
+
+        return;
+      }
+
+
+      // -------------------------
+      // PUBLIC URL
+      // -------------------------
+
+      const { data: publicData } =
+        supabaseClient
+          .storage
+          .from("boat-media")
+          .getPublicUrl(filePath);
+
+
+      const publicUrl =
+        publicData.publicUrl;
+
+
+      const isVideo =
+        file.type.startsWith("video/");
+
+
+      // -------------------------
+      // SAVE IMAGE / VIDEO RECORD
+      // -------------------------
+
+      const { error: imageError } =
+        await supabaseClient
+          .from("boat_images")
+          .insert({
+            boat_id: boat.id,
+            image_url: publicUrl,
+            is_video: isVideo
+          });
+
+
+      if (imageError) {
+
+        result.innerHTML =
+          '<div class="message">المركب اتضاف لكن حصل خطأ في تسجيل الملف:\n' +
+          imageError.message +
+          '</div>';
+
+        return;
+      }
+
+    }
+
+
+    result.innerHTML =
+      '<div class="message">✅ المركب اتضافت بنجاح!</div>';
+
+
+    // Clear form
+
+    document.getElementById("nameAr").value = "";
+    document.getElementById("nameEn").value = "";
+    document.getElementById("descriptionAr").value = "";
+    document.getElementById("descriptionEn").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("lengthFt").value = "";
+    document.getElementById("capacity").value = "";
+    document.getElementById("mediaFiles").value = "";
+
+  }
+
+
+  checkSession();
+
+</script>
+
+</body>
+</html>
