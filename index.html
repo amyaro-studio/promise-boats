@@ -77,4 +77,6 @@ function openDetail(id){const x=listings[id],ar=document.documentElement.lang===
 document.querySelectorAll(".details").forEach(b=>b.onclick=()=>openDetail(b.dataset.id));document.getElementById("back").onclick=()=>{detail.hidden=true;document.getElementById("boats").scrollIntoView({behavior:"smooth"})};
 setLang(localStorage.getItem("promise-lang")||"en");
 </script>
-</body></html>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</body>
+</html>
