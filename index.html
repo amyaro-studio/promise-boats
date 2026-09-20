@@ -78,5 +78,12 @@ document.querySelectorAll(".details").forEach(b=>b.onclick=()=>openDetail(b.data
 setLang(localStorage.getItem("promise-lang")||"en");
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+const supabaseClient = supabase.createClient(
+  "https://zsidomhwdshqsumxgamr.supabase.co",
+  "sb_publishable_73bsUKM0l9Q7Raw-ooRnpA_xWMca_nx"
+);
+</script>
+  
 </body>
 </html>
