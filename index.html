@@ -67,8 +67,7 @@ function setLang(lang){document.documentElement.lang=lang;document.documentEleme
 buttons.forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 const menu=document.getElementById("menu"),nav=document.getElementById("nav");menu.onclick=()=>nav.classList.toggle("open");nav.querySelectorAll("a").forEach(a=>a.onclick=()=>nav.classList.remove("open"));
 document.querySelectorAll(".filter").forEach(btn=>btn.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));btn.classList.add("active");const f=btn.dataset.filter;document.querySelectorAll(".card").forEach(c=>c.style.display=f==="all"||c.dataset.type===f?"":"none")});
-const listings={
-boat1:{type:"BOAT",nameEn:"Boat Listing 01",nameAr:"مركب 01",descEn:"Real photos of a Promise Boat listing. Specifications and price are available on request.",descAr:"صور حقيقية لمركب معروض من Promise Boat. المواصفات والسعر متاحان عند الطلب.",length:"—",capacity:"—",conditionEn:"Details on request",conditionAr:"التفاصيل عند الطلب",engine:"—",priceEn:"Price on Request",priceAr:"السعر عند الطلب",media:["boat1-front.jpg","boat1-side.jpg"]},
+let listings={boat1:{type:"BOAT",nameEn:"Boat Listing 01",nameAr:"مركب 01",descEn:"Real photos of a Promise Boat listing. Specifications and price are available on request.",descAr:"صور حقيقية لمركب معروض من Promise Boat. المواصفات والسعر متاحان عند الطلب.",length:"—",capacity:"—",conditionEn:"Details on request",conditionAr:"التفاصيل عند الطلب",engine:"—",priceEn:"Price on Request",priceAr:"السعر عند الطلب",media:["boat1-front.jpg","boat1-side.jpg"]},
 chaparral:{type:"YACHT",nameEn:"Chaparral American · 27 ft",nameAr:"يخت شابرل أمريكي · 27 قدم",descEn:"American Chaparral 27-ft yacht for sale, featuring a cabin, bathroom, kitchen, platform, tower and canopy. Fully refurbished and ready for use at our workshop.",descAr:"يخت شابرل أمريكي 27 قدم للبيع، مجهز بكابينة وحمام ومطبخ وبلاتفورم وتور وتاندة. اليخت جاهز بالكامل ومجدد في ورشتنا.",length:"27 FT",capacity:"—",conditionEn:"Fully refurbished",conditionAr:"جاهز بالكامل ومجدد",engine:"—",priceEn:"EGP 1,500,000",priceAr:"1,500,000 جنيه مصري",media:["chaparral-1.jpg","chaparral-2.jpg"],video:"chaparral-video-muted.mp4",extraEn:["Cabin","Bathroom","Kitchen","Platform","Tower","Canopy"],extraAr:["كابينة","حمام","مطبخ","بلاتفورم","تور","تاندة"]},
 seadoo:{type:"BOAT",nameEn:"Sea-Doo Jet Boat · 17 ft",nameAr:"جيت بوت سي دو · 17 قدم",descEn:"Sea-Doo Jet Boat, 17 ft, for 5 persons. Excellent condition, body in excellent shape with no cracks and original factory paint. Engine needs minor servicing and can be modified to an outboard. Includes the original canopy and trailer. Maintenance and modifications are available at our workshop.",descAr:"جيت بوت سي دو 17 قدم لـ5 أفراد، حالته ممتازة والبودي بحالة ممتازة بدون أي كسور وبوية بلاده الأصلية. الماكينة محتاجة صيانة بسيطة وممكن تتعدل أوت بورد. يأتي مع التاندة والمقطورة الأصليين. الصيانة والتعديلات متوفرة عندنا.",length:"17 FT",capacity:"5 persons",conditionEn:"Excellent",conditionAr:"ممتازة",engineEn:"Needs minor servicing / Outboard option",engineAr:"تحتاج صيانة بسيطة / إمكانية التعديل لأوت بورد",priceEn:"EGP 200,000",priceAr:"200,000 جنيه مصري",media:["seadoo-1.webp","seadoo-2.webp","seadoo-3.webp","seadoo-4.webp","seadoo-5.webp"]}
 };
@@ -83,6 +82,58 @@ const supabaseClient = supabase.createClient(
   "https://zsidomhwdshqsumxgamr.supabase.co",
   "sb_publishable_73bsUKM0l9Q7Raw-ooRnpA_xWMca_nx"
 );
+</script>
+  <script>
+async function loadListingsFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("boats")
+    .select(`
+      *,
+      boat_images (*)
+    `);
+
+  if (error) {
+    console.error("Supabase error:", error);
+    return;
+  }
+
+  const keyById = {
+    1: "chaparral",
+    2: "seadoo",
+    3: "boat1"
+  };
+
+  data.forEach(boat => {
+    const key = keyById[boat.id];
+    if (!key) return;
+
+    const images = (boat.boat_images || []).filter(item => !item.is_video);
+    const videos = (boat.boat_images || []).filter(item => item.is_video);
+
+    listings[key].nameEn = boat.name_en;
+    listings[key].nameAr = boat.name_ar;
+    listings[key].descEn = boat.description_en;
+    listings[key].descAr = boat.description_ar;
+    listings[key].length = boat.length_ft ? `${boat.length_ft} FT` : "—";
+    listings[key].capacity = boat.capacity ? `${boat.capacity} persons` : "—";
+    listings[key].priceEn = boat.price
+      ? `EGP ${Number(boat.price).toLocaleString("en-US")}`
+      : "Price on Request";
+    listings[key].priceAr = boat.price
+      ? `${Number(boat.price).toLocaleString("en-US")} جنيه مصري`
+      : "السعر عند الطلب";
+
+    listings[key].media = images.map(item => item.image_url);
+
+    if (videos.length) {
+      listings[key].video = videos[0].image_url;
+    }
+
+    console.log("Loaded from Supabase:", boat);
+  });
+}
+
+loadListingsFromSupabase();
 </script>
   
 </body>
