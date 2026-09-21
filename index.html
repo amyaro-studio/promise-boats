@@ -114,11 +114,17 @@ async function loadListingsFromSupabase() {
     listings[key].nameAr = boat.name_ar;
     listings[key].descEn = boat.description_en;
     listings[key].descAr = boat.description_ar;
-    listings[key].length = boat.length_ft ? `${boat.length_ft} FT` : "—";
-    listings[key].capacity = boat.capacity ? `${boat.capacity} persons` : "—";
+    listings[key].length = boat.length_ft
+      ? `${boat.length_ft} FT`
+      : "—";
+    listings[key].capacity = boat.capacity
+      ? `${boat.capacity} persons`
+      : "—";
+
     listings[key].priceEn = boat.price
       ? `EGP ${Number(boat.price).toLocaleString("en-US")}`
       : "Price on Request";
+
     listings[key].priceAr = boat.price
       ? `${Number(boat.price).toLocaleString("en-US")} جنيه مصري`
       : "السعر عند الطلب";
@@ -128,10 +134,11 @@ async function loadListingsFromSupabase() {
     if (videos.length) {
       listings[key].video = videos[0].image_url;
     }
-
-    console.log("Loaded from Supabase:", boat);
   });
+
+  renderListingCards();
 }
+
 function renderListingCards() {
   const cards = document.querySelectorAll(".cards .card");
 
@@ -181,6 +188,7 @@ function renderListingCards() {
 
     if (count) {
       const photoCount = item.media ? item.media.length : 0;
+
       count.textContent =
         photoCount === 1
           ? "1 photo"
@@ -197,8 +205,6 @@ function renderListingCards() {
   });
 
   setLang(localStorage.getItem("promise-lang") || "en");
-
-  renderListingCards();
 }
 
 loadListingsFromSupabase();
