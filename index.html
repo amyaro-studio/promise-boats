@@ -106,7 +106,14 @@ async function loadListingsFromSupabase() {
   data.forEach(boat => {
     const key = keyById[boat.id];
     if (!key) return;
+const category = boat.category || "boat";
 
+listings[key].category = category;
+
+listings[key].type =
+  category === "yacht" ? "YACHT" :
+  category === "jet" ? "JET" :
+  "BOAT";
     const images = (boat.boat_images || []).filter(item => !item.is_video);
     const videos = (boat.boat_images || []).filter(item => item.is_video);
 
@@ -157,7 +164,7 @@ function renderListingCards() {
     const desc = card.querySelector(".body p");
     const price = card.querySelector("strong");
     const details = card.querySelector(".details");
-card.dataset.type = item.type === "YACHT" ? "yacht" : "boat";    
+card.dataset.type = item.category === "yacht" ? "yacht" : "boat";
     if (image) {
       image.src = item.media && item.media.length
         ? item.media[0]
