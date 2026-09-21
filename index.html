@@ -67,13 +67,16 @@ function setLang(lang){document.documentElement.lang=lang;document.documentEleme
 buttons.forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 const menu=document.getElementById("menu"),nav=document.getElementById("nav");menu.onclick=()=>nav.classList.toggle("open");nav.querySelectorAll("a").forEach(a=>a.onclick=()=>nav.classList.remove("open"));
 document.querySelectorAll(".filter").forEach(btn=>btn.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));btn.classList.add("active");const f=btn.dataset.filter;document.querySelectorAll(".card").forEach(c=>c.style.display=f==="all"||c.dataset.type===f?"":"none")});
-let listings={boat1:{type:"BOAT",nameEn:"Boat Listing 01",nameAr:"مركب 01",descEn:"Real photos of a Promise Boat listing. Specifications and price are available on request.",descAr:"صور حقيقية لمركب معروض من Promise Boat. المواصفات والسعر متاحان عند الطلب.",length:"—",capacity:"—",conditionEn:"Details on request",conditionAr:"التفاصيل عند الطلب",engine:"—",priceEn:"Price on Request",priceAr:"السعر عند الطلب",media:["boat1-front.jpg","boat1-side.jpg"]},
-chaparral:{type:"YACHT",nameEn:"Chaparral American · 27 ft",nameAr:"يخت شابرل أمريكي · 27 قدم",descEn:"American Chaparral 27-ft yacht for sale, featuring a cabin, bathroom, kitchen, platform, tower and canopy. Fully refurbished and ready for use at our workshop.",descAr:"يخت شابرل أمريكي 27 قدم للبيع، مجهز بكابينة وحمام ومطبخ وبلاتفورم وتور وتاندة. اليخت جاهز بالكامل ومجدد في ورشتنا.",length:"27 FT",capacity:"—",conditionEn:"Fully refurbished",conditionAr:"جاهز بالكامل ومجدد",engine:"—",priceEn:"EGP 1,500,000",priceAr:"1,500,000 جنيه مصري",media:["chaparral-1.jpg","chaparral-2.jpg"],video:"chaparral-video-muted.mp4",extraEn:["Cabin","Bathroom","Kitchen","Platform","Tower","Canopy"],extraAr:["كابينة","حمام","مطبخ","بلاتفورم","تور","تاندة"]},
-seadoo:{type:"JET",nameEn:"Sea-Doo Jet Boat · 17 ft",nameAr:"جيت بوت سي دو · 17 قدم",descEn:"Sea-Doo Jet Boat, 17 ft, for 5 persons. Excellent condition, body in excellent shape with no cracks and original factory paint. Engine needs minor servicing and can be modified to an outboard. Includes the original canopy and trailer. Maintenance and modifications are available at our workshop.",descAr:"جيت بوت سي دو 17 قدم لـ5 أفراد، حالته ممتازة والبودي بحالة ممتازة بدون أي كسور وبوية بلاده الأصلية. الماكينة محتاجة صيانة بسيطة وممكن تتعدل أوت بورد. يأتي مع التاندة والمقطورة الأصليين. الصيانة والتعديلات متوفرة عندنا.",length:"17 FT",capacity:"5 persons",conditionEn:"Excellent",conditionAr:"ممتازة",engineEn:"Needs minor servicing / Outboard option",engineAr:"تحتاج صيانة بسيطة / إمكانية التعديل لأوت بورد",priceEn:"EGP 200,000",priceAr:"200,000 جنيه مصري",media:["seadoo-1.webp","seadoo-2.webp","seadoo-3.webp","seadoo-4.webp","seadoo-5.webp"]}
-};
+let listings={};
 const detail=document.getElementById("details");
 function openDetail(id){const x=listings[id],ar=document.documentElement.lang==="ar";detail.hidden=false;document.getElementById("detailType").textContent=ar?(x.type==="YACHT"?"يخت":"مركب"):x.type;document.getElementById("detailName").textContent=ar?x.nameAr:x.nameEn;document.getElementById("detailDesc").textContent=ar?x.descAr:x.descEn;document.getElementById("specLength").textContent=x.length;document.getElementById("specCapacity").textContent=x.capacity||"—";document.getElementById("specCondition").textContent=ar?x.conditionAr:x.conditionEn;document.getElementById("specEngine").textContent=ar?(x.engineAr||x.engine||"—"):(x.engineEn||x.engine||"—");document.getElementById("detailPrice").textContent=ar?x.priceAr:x.priceEn;const media=document.getElementById("detailMedia"),gallery=document.getElementById("gallery");gallery.innerHTML="";if(x.video){media.innerHTML='<video controls muted playsinline preload="metadata"><source src="'+x.video+'" type="video/mp4"></video><div class="video-note">'+(ar?"الفيديو بدون صوت":"Video is muted")+'</div>'}else{media.innerHTML='<img src="'+x.media[0]+'" alt="'+x.nameEn+'">'}x.media.forEach((src,i)=>{const im=document.createElement("img");im.src=src;im.alt=x.nameEn;im.className=i===0&&!x.video?"active":"";im.onclick=()=>{media.innerHTML='<img src="'+src+'" alt="'+x.nameEn+'">';gallery.querySelectorAll("img").forEach(a=>a.classList.remove("active"));im.classList.add("active")};gallery.appendChild(im)});const ex=document.getElementById("extraSpecs");ex.innerHTML="";if(x.extraEn){(ar?x.extraAr:x.extraEn).forEach(v=>{const d=document.createElement("div");d.textContent="✓ "+v;ex.appendChild(d)})}detail.scrollIntoView({behavior:"smooth"})}
-document.querySelectorAll(".details").forEach(b=>b.onclick=()=>openDetail(b.dataset.id));document.getElementById("back").onclick=()=>{detail.hidden=true;document.getElementById("boats").scrollIntoView({behavior:"smooth"})};
+document.querySelector(".cards").addEventListener("click", event => {
+  const button = event.target.closest(".details");
+
+  if (!button) return;
+
+  openDetail(button.dataset.id);
+});document.getElementById("back").onclick=()=>{detail.hidden=true;document.getElementById("boats").scrollIntoView({behavior:"smooth"})};
 setLang(localStorage.getItem("promise-lang")||"en");
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -97,126 +100,230 @@ async function loadListingsFromSupabase() {
     return;
   }
 
-  const keyById = {
-    1: "chaparral",
-    2: "seadoo",
-    3: "boat1"
+  listings = {};
+
+  const fallback = {
+    1: {
+      conditionEn: "Fully refurbished",
+      conditionAr: "جاهز بالكامل ومجدد",
+      engineEn: "—",
+      engineAr: "—",
+      extraEn: ["Cabin", "Bathroom", "Kitchen", "Platform", "Tower", "Canopy"],
+      extraAr: ["كابينة", "حمام", "مطبخ", "بلاتفورم", "تور", "تاندة"]
+    },
+
+    2: {
+      conditionEn: "Excellent",
+      conditionAr: "ممتازة",
+      engineEn: "Needs minor servicing / Outboard option",
+      engineAr: "تحتاج صيانة بسيطة / إمكانية التعديل لأوت بورد",
+      extraEn: [],
+      extraAr: []
+    },
+
+    3: {
+      conditionEn: "Fully refurbished",
+      conditionAr: "مجدد بالكامل",
+      engineEn: "—",
+      engineAr: "—",
+      extraEn: [],
+      extraAr: []
+    }
   };
 
-  data.forEach(boat => {
-    const key = keyById[boat.id];
-    if (!key) return;
-const category = boat.category || "boat";
+  const boats = [...(data || [])].sort((a, b) => a.id - b.id);
 
-listings[key].category = category;
+  boats.forEach(boat => {
+    const images = (boat.boat_images || [])
+      .filter(item => !item.is_video);
 
-listings[key].type =
-  category === "yacht" ? "YACHT" :
-  category === "jet" ? "JET" :
-  "BOAT";
-    const images = (boat.boat_images || []).filter(item => !item.is_video);
-    const videos = (boat.boat_images || []).filter(item => item.is_video);
+    const videos = (boat.boat_images || [])
+      .filter(item => item.is_video);
 
-    listings[key].nameEn = boat.name_en;
-    listings[key].nameAr = boat.name_ar;
-    listings[key].descEn = boat.description_en;
-    listings[key].descAr = boat.description_ar;
-    listings[key].length = boat.length_ft
-      ? `${boat.length_ft} FT`
-      : "—";
-    listings[key].capacity = boat.capacity
-      ? `${boat.capacity} persons`
-      : "—";
+    const category = boat.category || "boat";
 
-    listings[key].priceEn = boat.price
-      ? `EGP ${Number(boat.price).toLocaleString("en-US")}`
-      : "Price on Request";
+    const type =
+      category === "yacht" ? "YACHT" :
+      category === "jet" ? "JET" :
+      "BOAT";
 
-    listings[key].priceAr = boat.price
-      ? `${Number(boat.price).toLocaleString("en-US")} جنيه مصري`
-      : "السعر عند الطلب";
+    const typeAr =
+      category === "yacht" ? "يخت" :
+      category === "jet" ? "جيت" :
+      "مركب";
 
-    listings[key].media = images.map(item => item.image_url);
+    const old = fallback[boat.id] || {};
 
-    if (videos.length) {
-      listings[key].video = videos[0].image_url;
-    }
+    listings[boat.id] = {
+      id: boat.id,
+
+      category: category,
+      type: type,
+      typeAr: typeAr,
+
+      nameEn: boat.name_en || "Boat",
+      nameAr: boat.name_ar || "مركب",
+
+      descEn: boat.description_en || "",
+      descAr: boat.description_ar || "",
+
+      length: boat.length_ft
+        ? `${boat.length_ft} FT`
+        : "—",
+
+      capacity: boat.capacity
+        ? `${boat.capacity} persons`
+        : "—",
+
+      conditionEn: boat.condition_en || old.conditionEn || "—",
+      conditionAr: boat.condition_ar || old.conditionAr || "—",
+
+      engineEn: boat.engine_en || old.engineEn || "—",
+      engineAr: boat.engine_ar || old.engineAr || "—",
+
+      priceEn: boat.price
+        ? `EGP ${Number(boat.price).toLocaleString("en-US")}`
+        : "Price on Request",
+
+      priceAr: boat.price
+        ? `${Number(boat.price).toLocaleString("en-US")} جنيه مصري`
+        : "السعر عند الطلب",
+
+      media: images.map(item => item.image_url),
+
+      video: videos.length
+        ? videos[0].image_url
+        : null,
+
+      extraEn: old.extraEn || [],
+      extraAr: old.extraAr || []
+    };
   });
 
   renderListingCards();
 }
 
 function renderListingCards() {
-  const cards = document.querySelectorAll(".cards .card");
+  const container = document.querySelector(".cards");
 
-  const cardKeys = ["boat1", "chaparral", "seadoo"];
+  if (!container) return;
 
-  cards.forEach((card, index) => {
-    const key = cardKeys[index];
-    const item = listings[key];
+  container.innerHTML = "";
 
-    if (!item) return;
+  const items = Object.values(listings);
 
-    const image = card.querySelector(".photo img");
-    const type = card.querySelector(".photo span");
-    const count = card.querySelector(".count");
-    const title = card.querySelector("h3");
-    const desc = card.querySelector(".body p");
-    const price = card.querySelector("strong");
-    const details = card.querySelector(".details");
-card.dataset.type = item.category === "yacht" ? "yacht" : "boat";
-    if (image) {
-      image.src = item.media && item.media.length
+  const muted = document.querySelector(".section-title .muted");
+
+  if (muted) {
+    const count = items.length;
+
+    muted.dataset.en =
+      `${count} ${count === 1 ? "listing" : "listings"}`;
+
+    muted.dataset.ar =
+      `${count} ${count === 1 ? "إعلان" : "إعلانات"}`;
+  }
+
+  items.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "card";
+
+    card.dataset.type =
+      item.category === "yacht"
+        ? "yacht"
+        : "boat";
+
+    const photo = document.createElement("div");
+    photo.className = "photo real-photo";
+
+    const image = document.createElement("img");
+
+    image.src =
+      item.media && item.media.length
         ? item.media[0]
         : "";
-    }
 
-    if (type) {
-  type.dataset.en = item.type;
-  type.dataset.ar =
-    item.type === "YACHT" ? "يخت" :
-    item.type === "JET" ? "جيت" :
-    "مركب";
+    image.alt = item.nameEn;
 
-  type.textContent = item.type;
-}
-    if (title) {
-      title.textContent = item.nameEn;
-      title.dataset.en = item.nameEn;
-      title.dataset.ar = item.nameAr;
-    }
+    const type = document.createElement("span");
 
-    if (desc) {
-      desc.textContent = item.descEn;
-      desc.dataset.en = item.descEn;
-      desc.dataset.ar = item.descAr;
-    }
+    type.dataset.en = item.type;
+    type.dataset.ar = item.typeAr;
+    type.textContent = item.type;
 
-    if (price) {
-      price.textContent = item.priceEn;
-      price.dataset.en = item.priceEn;
-      price.dataset.ar = item.priceAr;
-    }
+    const count = document.createElement("span");
+    count.className = "count";
 
-    if (count) {
-      const photoCount = item.media ? item.media.length : 0;
+    const photoCount = item.media
+      ? item.media.length
+      : 0;
 
-      count.textContent =
-        photoCount === 1
-          ? "1 photo"
-          : `${photoCount} photos`;
+    count.dataset.en =
+      `${photoCount} ${photoCount === 1 ? "photo" : "photos"}${item.video ? " + video" : ""}`;
 
-      if (item.video) {
-        count.textContent += " + video";
-      }
-    }
+    count.dataset.ar =
+      `${photoCount} ${photoCount === 1 ? "صورة" : "صور"}${item.video ? " + فيديو" : ""}`;
 
-    if (details) {
-      details.dataset.id = key;
-    }
+    count.textContent = count.dataset.en;
+
+    photo.appendChild(image);
+    photo.appendChild(type);
+    photo.appendChild(count);
+
+    const body = document.createElement("div");
+    body.className = "body";
+
+    const title = document.createElement("h3");
+
+    title.dataset.en = item.nameEn;
+    title.dataset.ar = item.nameAr;
+    title.textContent = item.nameEn;
+
+    const desc = document.createElement("p");
+
+    desc.dataset.en = item.descEn;
+    desc.dataset.ar = item.descAr;
+    desc.textContent = item.descEn;
+
+    const price = document.createElement("strong");
+
+    price.dataset.en = item.priceEn;
+    price.dataset.ar = item.priceAr;
+    price.textContent = item.priceEn;
+
+    const details = document.createElement("button");
+
+    details.className = "outline details";
+    details.dataset.id = String(item.id);
+    details.dataset.en = "View Details";
+    details.dataset.ar = "التفاصيل";
+    details.textContent = "View Details";
+
+    body.appendChild(title);
+    body.appendChild(desc);
+    body.appendChild(price);
+    body.appendChild(details);
+
+    card.appendChild(photo);
+    card.appendChild(body);
+
+    container.appendChild(card);
   });
 
-  setLang(localStorage.getItem("promise-lang") || "en");
+  const activeFilter =
+    document.querySelector(".filter.active")?.dataset.filter || "all";
+
+  container.querySelectorAll(".card").forEach(card => {
+    card.style.display =
+      activeFilter === "all" ||
+      card.dataset.type === activeFilter
+        ? ""
+        : "none";
+  });
+
+  setLang(
+    localStorage.getItem("promise-lang") || "en"
+  );
 }
 
 loadListingsFromSupabase();
