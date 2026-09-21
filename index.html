@@ -165,9 +165,14 @@ card.dataset.type = item.type === "YACHT" ? "yacht" : "boat";
     }
 
     if (type) {
-      type.textContent = item.type;
-    }
+  type.dataset.en = item.type;
+  type.dataset.ar =
+    item.type === "YACHT" ? "يخت" :
+    item.type === "JET" ? "جيت" :
+    "مركب";
 
+  type.textContent = item.type;
+}
     if (title) {
       title.textContent = item.nameEn;
       title.dataset.en = item.nameEn;
