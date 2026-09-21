@@ -151,8 +151,6 @@ function renderListingCards() {
     const price = card.querySelector("strong");
     const details = card.querySelector(".details");
 
-    card.dataset.type = item.type.toLowerCase();
-
     if (image) {
       image.src = item.media && item.media.length
         ? item.media[0]
