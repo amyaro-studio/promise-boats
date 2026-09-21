@@ -132,6 +132,76 @@ async function loadListingsFromSupabase() {
     console.log("Loaded from Supabase:", boat);
   });
 }
+function renderListingCards() {
+  const cards = document.querySelectorAll(".cards .card");
+
+  const cardKeys = ["boat1", "chaparral", "seadoo"];
+
+  cards.forEach((card, index) => {
+    const key = cardKeys[index];
+    const item = listings[key];
+
+    if (!item) return;
+
+    const image = card.querySelector(".photo img");
+    const type = card.querySelector(".photo span");
+    const count = card.querySelector(".count");
+    const title = card.querySelector("h3");
+    const desc = card.querySelector(".body p");
+    const price = card.querySelector("strong");
+    const details = card.querySelector(".details");
+
+    card.dataset.type = item.type.toLowerCase();
+
+    if (image) {
+      image.src = item.media && item.media.length
+        ? item.media[0]
+        : "";
+    }
+
+    if (type) {
+      type.textContent = item.type;
+    }
+
+    if (title) {
+      title.textContent = item.nameEn;
+      title.dataset.en = item.nameEn;
+      title.dataset.ar = item.nameAr;
+    }
+
+    if (desc) {
+      desc.textContent = item.descEn;
+      desc.dataset.en = item.descEn;
+      desc.dataset.ar = item.descAr;
+    }
+
+    if (price) {
+      price.textContent = item.priceEn;
+      price.dataset.en = item.priceEn;
+      price.dataset.ar = item.priceAr;
+    }
+
+    if (count) {
+      const photoCount = item.media ? item.media.length : 0;
+      count.textContent =
+        photoCount === 1
+          ? "1 photo"
+          : `${photoCount} photos`;
+
+      if (item.video) {
+        count.textContent += " + video";
+      }
+    }
+
+    if (details) {
+      details.dataset.id = key;
+    }
+  });
+
+  setLang(localStorage.getItem("promise-lang") || "en");
+
+  renderListingCards();
+}
 
 loadListingsFromSupabase();
 </script>
