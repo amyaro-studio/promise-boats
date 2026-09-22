@@ -181,6 +181,13 @@ const supabaseClient = supabase.createClient(
 );
 
 const buttons = document.querySelectorAll(".lang");
+
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    setLang(button.dataset.lang);
+  });
+});
+
 const menu = document.getElementById("menu");
 const nav = document.getElementById("nav");
 const detail = document.getElementById("details");
