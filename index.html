@@ -467,6 +467,25 @@ if (menu && nav) {
     link.classList.add("active");
   };
 });
+  const sections = document.querySelectorAll("section[id]");
+
+window.addEventListener("scroll", () => {
+  let current = "";
+
+  sections.forEach(section => {
+    const top = section.offsetTop - 100;
+    if (window.scrollY >= top) {
+      current = section.getAttribute("id");
+    }
+  });
+
+  nav.querySelectorAll("a").forEach(link => {
+    link.classList.remove("active");
+    if (link.getAttribute("href") === "#" + current) {
+      link.classList.add("active");
+    }
+  });
+});
 }
 
 /* --------------------------------------------------
