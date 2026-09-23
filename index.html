@@ -467,8 +467,7 @@ if (menu && nav) {
     link.classList.add("active");
   };
 });
- const sections = document.querySelectorAll("section[id]");
-
+const sections = document.querySelectorAll("section[id]:not(#details)");
 window.addEventListener("scroll", () => {
   let current = "";
 
