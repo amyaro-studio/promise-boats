@@ -194,7 +194,7 @@ body.rtl .control select{
 
 <section class="detail-section" id="details" hidden>
 <div class="detail-top"><button id="back" class="back" data-en="← Back to Listings" data-ar="→ العودة للمراكب">← Back to Listings</button><span id="detailStatus" data-en="FOR SALE" data-ar="للبيع">FOR SALE</span></div>
-<div class="detail-grid"><div><div id="detailMedia" class="detail-media"></div><div id="gallery" class="gallery"></div></div><div class="detail-copy"><p class="eyebrow" id="detailType">YACHT</p><h2 id="detailName">—</h2><p id="detailDesc">—</p><div class="specs"><div><small data-en="Length" data-ar="الطول">Length</small><b id="specLength">—</b></div><div><small data-en="Capacity" data-ar="السعة">Capacity</small><b id="specCapacity">—</b></div><div><small data-en="Condition" data-ar="الحالة">Condition</small><b id="specCondition">—</b></div><div><small data-en="Engine" data-ar="الموتور">Engine</small><b id="specEngine">—</b></div></div><div id="extraSpecs" class="extra-specs"></div><h3 id="detailPrice">—</h3><div class="contact-actions"><a class="btn navy" href="https://wa.me/201000457254" target="_blank" data-en="WhatsApp →" data-ar="واتساب ←">WhatsApp →</a><a class="btn phone" href="tel:01000457254" data-en="Call Promise" data-ar="اتصل بـ Promise">Call Promise</a></div></div></div>
+<div class="detail-grid"><div><div id="detailMedia" class="detail-media"></div><div id="gallery" class="gallery"></div></div><div class="detail-copy"><p class="eyebrow" id="detailType">YACHT</p><h2 id="detailName">—</h2><p id="detailDesc">—</p><div class="specs"><div><small data-en="Length" data-ar="الطول">Length</small><b id="specLength">—</b></div><div><small data-en="Capacity" data-ar="السعة">Capacity</small><b id="specCapacity">—</b></div><div><small data-en="Condition" data-ar="الحالة">Condition</small><b id="specCondition">—</b></div><div><small data-en="Engine" data-ar="الموتور">Engine</small><b id="specEngine">—</b></div></div><div id="extraSpecs" class="extra-specs"></div><h3 id="detailPrice">—</h3><div class="contact-actions"><a class="btn navy" href="#" id="whatsappBtn" target="_blank" data-en="WhatsApp →" data-ar="واتساب ←">WhatsApp →</a><a class="btn phone" href="tel:01000457254" data-en="Call Promise" data-ar="اتصل بـ Promise">Call Promise</a></div></div></div>
 </section>
 
 <section class="services" id="services"><div class="section-title"><div><p class="eyebrow" data-en="WHAT WE DO" data-ar="ماذا نقدم">WHAT WE DO</p><h2 data-en="Our Services" data-ar="خدماتنا">Our Services</h2></div></div><div class="service-grid">
@@ -898,6 +898,69 @@ function openDetail(id, shouldScroll = true) {
 
     extra.appendChild(div);
   });
+    extraList.forEach(value => {
+
+    const div =
+      document.createElement("div");
+
+    div.textContent = "✓ " + value;
+
+    extra.appendChild(div);
+  });
+
+      const whatsappBtn =
+    document.getElementById("whatsappBtn");
+
+  if (whatsappBtn) {
+
+    const boatName =
+      isArabic ? item.nameAr : item.nameEn;
+
+    const boatType =
+      isArabic ? item.typeAr : item.type;
+
+    const boatLength =
+      isArabic ? item.lengthAr : item.lengthEn;
+
+    const boatCapacity =
+      isArabic ? item.capacityAr : item.capacityEn;
+
+    const boatCondition =
+      isArabic ? item.conditionAr : item.conditionEn;
+
+    const boatEngine =
+      isArabic ? item.engineAr : item.engineEn;
+
+    const boatPrice =
+      isArabic ? item.priceAr : item.priceEn;
+
+    const message = isArabic
+      ? `مرحبًا، أريد الاستفسار عن هذا المركب من موقع PROMISE:
+
+اسم المركب: ${boatName}
+النوع: ${boatType}
+الطول: ${boatLength}
+السعة: ${boatCapacity}
+الحالة: ${boatCondition}
+الموتور: ${boatEngine}
+السعر: ${boatPrice}
+
+أرغب في معرفة المزيد من التفاصيل.`
+      : `Hello, I would like to inquire about this boat from the PROMISE website:
+
+Boat: ${boatName}
+Type: ${boatType}
+Length: ${boatLength}
+Capacity: ${boatCapacity}
+Condition: ${boatCondition}
+Engine: ${boatEngine}
+Price: ${boatPrice}
+
+I would like to know more details.`;
+
+    whatsappBtn.href =
+      `https://wa.me/201000457254?text=${encodeURIComponent(message)}`;
+  }
 
   if (shouldScroll) {
     detail.scrollIntoView({
