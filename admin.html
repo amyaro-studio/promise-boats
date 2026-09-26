@@ -1321,6 +1321,91 @@
 
   checkSession();
 
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+
+  if (event === "PASSWORD_RECOVERY") {
+
+    const adminBox = document.getElementById("adminBox");
+
+    adminBox.classList.remove("hidden");
+
+    adminBox.innerHTML = `
+      <div class="box">
+        <h1>Set New Password</h1>
+
+        <input
+          type="password"
+          id="newPassword"
+          placeholder="New Password"
+        >
+
+        <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Confirm New Password"
+        >
+
+        <button onclick="updatePassword()">
+          Save New Password
+        </button>
+
+        <div id="resetMessage"></div>
+      </div>
+    `;
+  }
+
+});
+
+
+async function updatePassword() {
+
+  const password =
+    document.getElementById("newPassword").value;
+
+  const confirm =
+    document.getElementById("confirmPassword").value;
+
+  const message =
+    document.getElementById("resetMessage");
+
+
+  if (password.length < 6) {
+
+    message.innerHTML =
+      '<div class="message">Password must be at least 6 characters.</div>';
+
+    return;
+  }
+
+
+  if (password !== confirm) {
+
+    message.innerHTML =
+      '<div class="message">Passwords do not match.</div>';
+
+    return;
+  }
+
+
+  const { error } =
+    await supabaseClient.auth.updateUser({
+      password: password
+    });
+
+
+  if (error) {
+
+    message.innerHTML =
+      '<div class="message">' + error.message + '</div>';
+
+    return;
+  }
+
+
+  message.innerHTML =
+    '<div class="message">Password updated successfully.</div>';
+}
+
 </script>
 
 </body>
