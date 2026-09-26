@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Promise Boat - Admin</title>
+
+  <title>PROMISE MARINE - Admin</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -20,7 +21,7 @@
     }
 
     .container {
-      max-width: 850px;
+      max-width: 1000px;
       margin: 30px auto;
       padding: 20px;
     }
@@ -33,11 +34,14 @@
       box-shadow: 0 4px 18px rgba(0,0,0,.08);
     }
 
-    h1, h2 {
+    h1, h2, h3 {
       margin-top: 0;
     }
 
-    input, textarea, button {
+    input,
+    textarea,
+    select,
+    button {
       width: 100%;
       padding: 13px;
       margin-top: 8px;
@@ -45,6 +49,7 @@
       border-radius: 8px;
       border: 1px solid #ccd6df;
       font-size: 16px;
+      font-family: inherit;
     }
 
     textarea {
@@ -64,6 +69,18 @@
       opacity: .9;
     }
 
+    .danger {
+      background: #b42318;
+    }
+
+    .secondary {
+      background: #64748b;
+    }
+
+    .success {
+      background: #18794e;
+    }
+
     .hidden {
       display: none;
     }
@@ -72,13 +89,103 @@
       padding: 12px;
       border-radius: 8px;
       margin-top: 10px;
+      margin-bottom: 10px;
       white-space: pre-wrap;
+      background: #eef3f7;
     }
 
     label {
       font-weight: bold;
       display: block;
       margin-top: 8px;
+    }
+
+    .boat-card {
+      border: 1px solid #d9e1e7;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 15px;
+      background: #fafcfd;
+    }
+
+    .boat-card h3 {
+      margin-bottom: 8px;
+    }
+
+    .boat-info {
+      color: #526476;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .media-item {
+      border: 1px solid #d9e1e7;
+      border-radius: 10px;
+      overflow: hidden;
+      background: white;
+      padding-bottom: 8px;
+    }
+
+    .media-item img,
+    .media-item video {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-item button {
+      width: calc(100% - 12px);
+      margin: 6px;
+      padding: 8px;
+      font-size: 13px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .actions button {
+      margin-bottom: 0;
+    }
+
+    .edit-box {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      border: 1px solid #d9e1e7;
+    }
+
+    .top-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media(max-width:600px) {
+      .container {
+        padding: 12px;
+        margin: 10px auto;
+      }
+
+      .box {
+        padding: 18px;
+      }
+
+      .actions,
+      .top-actions {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -89,62 +196,120 @@
 
   <!-- LOGIN -->
   <div class="box" id="loginBox">
-    <h1>Promise Boat</h1>
+
+    <h1>PROMISE MARINE</h1>
     <h2>Admin Login</h2>
 
     <label>Email</label>
-    <input type="email" id="loginEmail" placeholder="Email">
+    <input
+      type="email"
+      id="loginEmail"
+      placeholder="Email"
+    >
 
     <label>Password</label>
-    <input type="password" id="loginPassword" placeholder="Password">
+    <input
+      type="password"
+      id="loginPassword"
+      placeholder="Password"
+    >
 
     <button onclick="login()">Login</button>
 
     <div id="loginMessage"></div>
+
   </div>
 
 
   <!-- ADMIN -->
-  <div class="box hidden" id="adminBox">
+  <div class="hidden" id="adminBox">
 
-    <h1>Promise Boat Admin</h1>
+    <div class="box">
 
-    <button onclick="logout()">Logout</button>
+      <div class="top-actions">
 
-    <h2>Add New Boat</h2>
+        <button onclick="loadBoats()">
+          Refresh Boats
+        </button>
 
-    <label>اسم المركب بالعربي</label>
-    <input id="nameAr" type="text">
+        <button
+          class="secondary"
+          onclick="logout()"
+        >
+          Logout
+        </button>
 
-    <label>Boat name in English</label>
-    <input id="nameEn" type="text">
+      </div>
 
-    <label>الوصف بالعربي</label>
-    <textarea id="descriptionAr"></textarea>
+      <h1>PROMISE MARINE Admin</h1>
 
-    <label>Description in English</label>
-    <textarea id="descriptionEn"></textarea>
+    </div>
 
-    <label>السعر</label>
-    <input id="price" type="number">
 
-    <label>الطول بالقدم</label>
-    <input id="lengthFt" type="number">
+    <!-- ADD BOAT -->
+    <div class="box">
 
-    <label>عدد الأشخاص</label>
-    <input id="capacity" type="number">
+      <h2>Add New Boat</h2>
 
-    <label>صور وفيديو المركب</label>
-    <input
-      id="mediaFiles"
-      type="file"
-      accept="image/*,video/*"
-      multiple
-    >
+      <label>اسم المركب بالعربي</label>
+      <input id="nameAr" type="text">
 
-    <button onclick="addBoat()">Add Boat</button>
+      <label>Boat name in English</label>
+      <input id="nameEn" type="text">
 
-    <div id="result"></div>
+      <label>الوصف بالعربي</label>
+      <textarea id="descriptionAr"></textarea>
+
+      <label>Description in English</label>
+      <textarea id="descriptionEn"></textarea>
+
+      <label>السعر</label>
+      <input id="price" type="number">
+
+      <label>الطول بالقدم</label>
+      <input id="lengthFt" type="number">
+
+      <label>عدد الأشخاص</label>
+      <input id="capacity" type="number">
+
+      <label>التصنيف</label>
+      <input
+        id="category"
+        type="text"
+        placeholder="Yacht / Boat / Jet Boat"
+      >
+
+      <label>صور وفيديو المركب</label>
+
+      <input
+        id="mediaFiles"
+        type="file"
+        accept="image/*,video/*"
+        multiple
+      >
+
+      <button
+        class="success"
+        onclick="addBoat()"
+      >
+        Add Boat
+      </button>
+
+      <div id="result"></div>
+
+    </div>
+
+
+    <!-- BOATS -->
+    <div class="box">
+
+      <h2>Boats</h2>
+
+      <div id="boatsList">
+        جاري تحميل المراكب...
+      </div>
+
+    </div>
 
   </div>
 
@@ -159,8 +324,14 @@
   const SUPABASE_KEY =
     "sb_publishable_73bsUKM0l9Q7Raw-ooRnpA_xWMca_nx";
 
+  const ADMIN_UID =
+    "9290441e-47ed-408d-acc0-f29b0a539912";
+
   const supabaseClient =
-    supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
 
   // =========================
@@ -181,8 +352,10 @@
     message.innerHTML = "";
 
     if (!email || !password) {
+
       message.innerHTML =
         '<div class="message">اكتبي الإيميل والباسورد.</div>';
+
       return;
     }
 
@@ -193,10 +366,22 @@
       });
 
     if (error) {
+
       message.innerHTML =
         '<div class="message">' +
         error.message +
         '</div>';
+
+      return;
+    }
+
+    if (!data.user || data.user.id !== ADMIN_UID) {
+
+      await supabaseClient.auth.signOut();
+
+      message.innerHTML =
+        '<div class="message">هذا الحساب ليس لديه صلاحية Admin.</div>';
+
       return;
     }
 
@@ -218,6 +403,8 @@
     document
       .getElementById("adminBox")
       .classList.remove("hidden");
+
+    loadBoats();
 
   }
 
@@ -249,10 +436,17 @@
 
     const {
       data: { session }
-    } = await supabaseClient.auth.getSession();
+    } =
+      await supabaseClient.auth.getSession();
 
-    if (session) {
+    if (
+      session &&
+      session.user &&
+      session.user.id === ADMIN_UID
+    ) {
+
       showAdmin();
+
     }
 
   }
@@ -291,6 +485,9 @@
     const capacity =
       document.getElementById("capacity").value;
 
+    const category =
+      document.getElementById("category").value.trim();
+
     const files =
       document.getElementById("mediaFiles").files;
 
@@ -304,10 +501,6 @@
     }
 
 
-    // -------------------------
-    // ADD BOAT
-    // -------------------------
-
     const { data: boat, error: boatError } =
       await supabaseClient
         .from("boats")
@@ -318,7 +511,8 @@
           description_en: descriptionEn,
           price: price ? Number(price) : null,
           length_ft: lengthFt ? Number(lengthFt) : null,
-          capacity: capacity ? Number(capacity) : null
+          capacity: capacity ? Number(capacity) : null,
+          category: category || null
         })
         .select()
         .single();
@@ -334,10 +528,6 @@
       return;
     }
 
-
-    // -------------------------
-    // UPLOAD MEDIA
-    // -------------------------
 
     for (let i = 0; i < files.length; i++) {
 
@@ -372,10 +562,6 @@
       }
 
 
-      // -------------------------
-      // PUBLIC URL
-      // -------------------------
-
       const { data: publicData } =
         supabaseClient
           .storage
@@ -390,10 +576,6 @@
       const isVideo =
         file.type.startsWith("video/");
 
-
-      // -------------------------
-      // SAVE IMAGE / VIDEO RECORD
-      // -------------------------
 
       const { error: imageError } =
         await supabaseClient
@@ -422,7 +604,18 @@
       '<div class="message">✅ المركب اتضافت بنجاح!</div>';
 
 
-    // Clear form
+    clearForm();
+
+    await loadBoats();
+
+  }
+
+
+  // =========================
+  // CLEAR FORM
+  // =========================
+
+  function clearForm() {
 
     document.getElementById("nameAr").value = "";
     document.getElementById("nameEn").value = "";
@@ -431,10 +624,700 @@
     document.getElementById("price").value = "";
     document.getElementById("lengthFt").value = "";
     document.getElementById("capacity").value = "";
+    document.getElementById("category").value = "";
     document.getElementById("mediaFiles").value = "";
 
   }
 
+
+  // =========================
+  // LOAD BOATS
+  // =========================
+
+  async function loadBoats() {
+
+    const list =
+      document.getElementById("boatsList");
+
+    list.innerHTML =
+      '<div class="message">جاري تحميل المراكب...</div>';
+
+
+    const { data: boats, error } =
+      await supabaseClient
+        .from("boats")
+        .select("*")
+        .order("created_at", {
+          ascending: false
+        });
+
+
+    if (error) {
+
+      list.innerHTML =
+        '<div class="message">خطأ في تحميل المراكب:\n' +
+        error.message +
+        '</div>';
+
+      return;
+    }
+
+
+    if (!boats || boats.length === 0) {
+
+      list.innerHTML =
+        '<div class="message">لا توجد مراكب حتى الآن.</div>';
+
+      return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    for (const boat of boats) {
+
+      const card =
+        document.createElement("div");
+
+      card.className = "boat-card";
+
+      card.innerHTML = `
+
+        <h3>
+          ${escapeHtml(boat.name_ar || "")}
+          /
+          ${escapeHtml(boat.name_en || "")}
+        </h3>
+
+        <div class="boat-info">
+
+          السعر:
+          ${boat.price != null ? boat.price : "-"}
+          <br>
+
+          الطول:
+          ${boat.length_ft != null ? boat.length_ft + " ft" : "-"}
+          <br>
+
+          السعة:
+          ${boat.capacity != null ? boat.capacity + " أشخاص" : "-"}
+          <br>
+
+          التصنيف:
+          ${escapeHtml(boat.category || "-")}
+
+        </div>
+
+        <div id="media-${boat.id}">
+          جاري تحميل الصور...
+        </div>
+
+        <div class="actions">
+
+          <button
+            onclick="toggleEdit(${boat.id})"
+          >
+            Edit
+          </button>
+
+          <button
+            class="danger"
+            onclick="deleteBoat(${boat.id})"
+          >
+            Delete
+          </button>
+
+        </div>
+
+        <div
+          id="edit-${boat.id}"
+          class="edit-box hidden"
+        >
+
+          <h3>تعديل المركب</h3>
+
+          <label>الاسم بالعربي</label>
+          <input
+            id="edit-name-ar-${boat.id}"
+            value="${escapeAttribute(boat.name_ar || "")}"
+          >
+
+          <label>الاسم بالإنجليزي</label>
+          <input
+            id="edit-name-en-${boat.id}"
+            value="${escapeAttribute(boat.name_en || "")}"
+          >
+
+          <label>الوصف بالعربي</label>
+          <textarea
+            id="edit-description-ar-${boat.id}"
+          >${escapeHtml(boat.description_ar || "")}</textarea>
+
+          <label>الوصف بالإنجليزي</label>
+          <textarea
+            id="edit-description-en-${boat.id}"
+          >${escapeHtml(boat.description_en || "")}</textarea>
+
+          <label>السعر</label>
+          <input
+            id="edit-price-${boat.id}"
+            type="number"
+            value="${boat.price != null ? boat.price : ""}"
+          >
+
+          <label>الطول بالقدم</label>
+          <input
+            id="edit-length-${boat.id}"
+            type="number"
+            value="${boat.length_ft != null ? boat.length_ft : ""}"
+          >
+
+          <label>عدد الأشخاص</label>
+          <input
+            id="edit-capacity-${boat.id}"
+            type="number"
+            value="${boat.capacity != null ? boat.capacity : ""}"
+          >
+
+          <label>التصنيف</label>
+          <input
+            id="edit-category-${boat.id}"
+            value="${escapeAttribute(boat.category || "")}"
+          >
+
+          <label>إضافة صور أو فيديوهات جديدة</label>
+
+          <input
+            id="edit-media-${boat.id}"
+            type="file"
+            accept="image/*,video/*"
+            multiple
+          >
+
+          <button
+            class="success"
+            onclick="saveBoat(${boat.id})"
+          >
+            Save Changes
+          </button>
+
+        </div>
+      `;
+
+
+      list.appendChild(card);
+
+      loadBoatMedia(boat.id);
+
+    }
+
+  }
+
+
+  // =========================
+  // LOAD BOAT MEDIA
+  // =========================
+
+  async function loadBoatMedia(boatId) {
+
+    const container =
+      document.getElementById(
+        "media-" + boatId
+      );
+
+    if (!container) return;
+
+
+    const { data: media, error } =
+      await supabaseClient
+        .from("boat_images")
+        .select("*")
+        .eq("boat_id", boatId)
+        .order("id", {
+          ascending: true
+        });
+
+
+    if (error) {
+
+      container.innerHTML =
+        '<div class="message">خطأ في تحميل الملفات.</div>';
+
+      return;
+    }
+
+
+    if (!media || media.length === 0) {
+
+      container.innerHTML =
+        '<div class="boat-info">لا توجد صور أو فيديوهات.</div>';
+
+      return;
+    }
+
+
+    const grid =
+      document.createElement("div");
+
+    grid.className = "media-grid";
+
+
+    media.forEach(item => {
+
+      const div =
+        document.createElement("div");
+
+      div.className = "media-item";
+
+
+      if (item.is_video) {
+
+        div.innerHTML = `
+          <video
+            src="${item.image_url}"
+            controls
+            muted
+          ></video>
+
+          <button
+            class="danger"
+            onclick="deleteMedia(
+              ${item.id},
+              '${escapeJs(item.image_url)}'
+            )"
+          >
+            حذف الفيديو
+          </button>
+        `;
+
+      } else {
+
+        div.innerHTML = `
+          <img
+            src="${item.image_url}"
+            alt="Boat media"
+          >
+
+          <button
+            class="danger"
+            onclick="deleteMedia(
+              ${item.id},
+              '${escapeJs(item.image_url)}'
+            )"
+          >
+            حذف الصورة
+          </button>
+        `;
+
+      }
+
+
+      grid.appendChild(div);
+
+    });
+
+
+    container.innerHTML = "";
+    container.appendChild(grid);
+
+  }
+
+
+  // =========================
+  // TOGGLE EDIT
+  // =========================
+
+  function toggleEdit(boatId) {
+
+    const box =
+      document.getElementById(
+        "edit-" + boatId
+      );
+
+    box.classList.toggle("hidden");
+
+  }
+
+
+  // =========================
+  // SAVE BOAT
+  // =========================
+
+  async function saveBoat(boatId) {
+
+    const nameAr =
+      document.getElementById(
+        "edit-name-ar-" + boatId
+      ).value.trim();
+
+    const nameEn =
+      document.getElementById(
+        "edit-name-en-" + boatId
+      ).value.trim();
+
+    const descriptionAr =
+      document.getElementById(
+        "edit-description-ar-" + boatId
+      ).value.trim();
+
+    const descriptionEn =
+      document.getElementById(
+        "edit-description-en-" + boatId
+      ).value.trim();
+
+    const price =
+      document.getElementById(
+        "edit-price-" + boatId
+      ).value;
+
+    const lengthFt =
+      document.getElementById(
+        "edit-length-" + boatId
+      ).value;
+
+    const capacity =
+      document.getElementById(
+        "edit-capacity-" + boatId
+      ).value;
+
+    const category =
+      document.getElementById(
+        "edit-category-" + boatId
+      ).value.trim();
+
+    const files =
+      document.getElementById(
+        "edit-media-" + boatId
+      ).files;
+
+
+    if (!nameAr || !nameEn) {
+
+      alert(
+        "اكتبي اسم المركب بالعربي والإنجليزي."
+      );
+
+      return;
+    }
+
+
+    const { error } =
+      await supabaseClient
+        .from("boats")
+        .update({
+          name_ar: nameAr,
+          name_en: nameEn,
+          description_ar: descriptionAr,
+          description_en: descriptionEn,
+          price: price ? Number(price) : null,
+          length_ft: lengthFt ? Number(lengthFt) : null,
+          capacity: capacity ? Number(capacity) : null,
+          category: category || null
+        })
+        .eq("id", boatId);
+
+
+    if (error) {
+
+      alert(
+        "حصل خطأ أثناء تعديل المركب:\n" +
+        error.message
+      );
+
+      return;
+    }
+
+
+    if (files.length > 0) {
+
+      for (let i = 0; i < files.length; i++) {
+
+        const file = files[i];
+
+        const safeName =
+          Date.now() +
+          "_" +
+          i +
+          "_" +
+          file.name.replace(/\s+/g, "_");
+
+        const filePath =
+          boatId + "/" + safeName;
+
+
+        const { error: uploadError } =
+          await supabaseClient
+            .storage
+            .from("boat-media")
+            .upload(filePath, file);
+
+
+        if (uploadError) {
+
+          alert(
+            "تم تعديل البيانات، لكن حصل خطأ في رفع أحد الملفات:\n" +
+            uploadError.message
+          );
+
+          await loadBoats();
+
+          return;
+        }
+
+
+        const { data: publicData } =
+          supabaseClient
+            .storage
+            .from("boat-media")
+            .getPublicUrl(filePath);
+
+
+        const { error: mediaError } =
+          await supabaseClient
+            .from("boat_images")
+            .insert({
+              boat_id: boatId,
+              image_url: publicData.publicUrl,
+              is_video: file.type.startsWith("video/")
+            });
+
+
+        if (mediaError) {
+
+          alert(
+            "تم رفع الملف، لكن حصل خطأ في تسجيله:\n" +
+            mediaError.message
+          );
+
+          await loadBoats();
+
+          return;
+        }
+
+      }
+
+    }
+
+
+    alert("تم حفظ التعديلات بنجاح.");
+
+    await loadBoats();
+
+  }
+
+
+  // =========================
+  // DELETE MEDIA
+  // =========================
+
+  async function deleteMedia(
+    mediaId,
+    publicUrl
+  ) {
+
+    const confirmed =
+      confirm(
+        "هل تريدين حذف هذا الملف؟"
+      );
+
+    if (!confirmed) return;
+
+
+    const marker =
+      "/storage/v1/object/public/boat-media/";
+
+    const index =
+      publicUrl.indexOf(marker);
+
+
+    if (index !== -1) {
+
+      const filePath =
+        decodeURIComponent(
+          publicUrl.substring(
+            index + marker.length
+          )
+        );
+
+
+      await supabaseClient
+        .storage
+        .from("boat-media")
+        .remove([filePath]);
+
+    }
+
+
+    const { error } =
+      await supabaseClient
+        .from("boat_images")
+        .delete()
+        .eq("id", mediaId);
+
+
+    if (error) {
+
+      alert(
+        "حصل خطأ أثناء حذف الملف:\n" +
+        error.message
+      );
+
+      return;
+    }
+
+
+    alert("تم حذف الملف.");
+
+    await loadBoats();
+
+  }
+
+
+  // =========================
+  // DELETE BOAT
+  // =========================
+
+  async function deleteBoat(boatId) {
+
+    const confirmed =
+      confirm(
+        "هل أنتِ متأكدة من حذف المركب وكل الصور والفيديوهات الخاصة به؟"
+      );
+
+    if (!confirmed) return;
+
+
+    const { data: media } =
+      await supabaseClient
+        .from("boat_images")
+        .select("*")
+        .eq("boat_id", boatId);
+
+
+    if (media && media.length > 0) {
+
+      const paths = [];
+
+
+      for (const item of media) {
+
+        const marker =
+          "/storage/v1/object/public/boat-media/";
+
+        const index =
+          item.image_url.indexOf(marker);
+
+
+        if (index !== -1) {
+
+          const path =
+            decodeURIComponent(
+              item.image_url.substring(
+                index + marker.length
+              )
+            );
+
+          paths.push(path);
+
+        }
+
+      }
+
+
+      if (paths.length > 0) {
+
+        await supabaseClient
+          .storage
+          .from("boat-media")
+          .remove(paths);
+
+      }
+
+
+      const { error: mediaDeleteError } =
+        await supabaseClient
+          .from("boat_images")
+          .delete()
+          .eq("boat_id", boatId);
+
+
+      if (mediaDeleteError) {
+
+        alert(
+          "حصل خطأ في حذف ملفات المركب:\n" +
+          mediaDeleteError.message
+        );
+
+        return;
+      }
+
+    }
+
+
+    const { error } =
+      await supabaseClient
+        .from("boats")
+        .delete()
+        .eq("id", boatId);
+
+
+    if (error) {
+
+      alert(
+        "حصل خطأ أثناء حذف المركب:\n" +
+        error.message
+      );
+
+      return;
+    }
+
+
+    alert("تم حذف المركب وكل ملفاته بنجاح.");
+
+    await loadBoats();
+
+  }
+
+
+  // =========================
+  // SECURITY HELPERS
+  // =========================
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  function escapeAttribute(value) {
+
+    return escapeHtml(value);
+
+  }
+
+
+  function escapeJs(value) {
+
+    return String(value)
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, "\\n")
+      .replace(/\r/g, "\\r");
+
+  }
+
+
+  // =========================
+  // START
+  // =========================
 
   checkSession();
 
