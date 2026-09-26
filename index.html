@@ -33,7 +33,18 @@ ypt, boat maintenance Egypt, PROMISE MARINE, مراكب للبيع, يخوت ل�
   background:#10263a;
   color:#fff;
 }
-  #nav a:hover{opacity:.55}.actions{display:flex;gap:3px;align-items:center}.lang{border:1px solid #10263a;border-radius:18px;background:transparent;padding:7px 10px;cursor:pointer;font-size:11px}.lang.active{background:#10263a;color:#fff}#menu{display:none;border:0;background:transparent;font-size:23px}.hero{height:760px;margin-top:78px;position:relative;display:flex;align-items:center;overflow:hidden;color:#fff}.hero-bg{position:absolute;inset:0;background:url("hero.jpg") center/cover no-repeat}.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,23,38,.88),rgba(5,23,38,.4) 58%,rgba(5,23,38,.08))}.hero-content{position:relative;z-index:2;margin-left:8%;max-width:700px;padding:50px 20px}.eyebrow{font-size:11px;letter-spacing:4px;font-weight:700;margin:0 0 15px}.hero h1{font:600 clamp(52px,7vw,86px)/.98 "Playfair Display",serif;margin:0 0 22px}.hero-content>p:not(.eyebrow){line-height:1.8;font-size:16px;color:#e8eef1;max-width:620px}.btn{display:inline-block;padding:14px 22px;border-radius:28px;font-size:13px;font-weight:700;margin-top:15px}.light{background:#fff;color:#10263a}.intro{padding:75px 8%;display:grid;grid-template-columns:1.1fr .9fr;gap:80px;align-items:center}.intro h2,.section h2,.split h2,.cta h2,.detail-copy h2{font:600 46px/1.1 "Playfair Display",serif;margin:0}.intro>p{line-height:1.9;color:#5b6b79;font-size:15px}
+  #nav a:hover{opacity:.55}.actions{display:flex;gap:3px;align-items:center}.lang{border:1px solid #10263a;border-radius:18px;background:transparent;padding:7px 10px;cursor:pointer;font-size:11px}.lang.active{background:#10263a;color:#fff}#menu{display:none;border:0;background:transparent;font-size:23px}.hero{height:760px;margin-top:78px;position:relative;display:flex;align-items:center;overflow:hidden;color:#fff}.hero-bg{position:absolute;inset:0;background:url("hero.jpg") center/cover no-repeat}
+  .hero-bg{
+  width:100%;
+  max-width:none;
+}
+  @media(max-width:560px){
+  .hero-bg{
+    background-size:cover;
+    background-position:center center;
+  }
+}
+  .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,23,38,.88),rgba(5,23,38,.4) 58%,rgba(5,23,38,.08))}.hero-content{position:relative;z-index:2;margin-left:8%;max-width:700px;padding:50px 20px}.eyebrow{font-size:11px;letter-spacing:4px;font-weight:700;margin:0 0 15px}.hero h1{font:600 clamp(52px,7vw,86px)/.98 "Playfair Display",serif;margin:0 0 22px}.hero-content>p:not(.eyebrow){line-height:1.8;font-size:16px;color:#e8eef1;max-width:620px}.btn{display:inline-block;padding:14px 22px;border-radius:28px;font-size:13px;font-weight:700;margin-top:15px}.light{background:#fff;color:#10263a}.intro{padding:75px 8%;display:grid;grid-template-columns:1.1fr .9fr;gap:80px;align-items:center}.intro h2,.section h2,.split h2,.cta h2,.detail-copy h2{font:600 46px/1.1 "Playfair Display",serif;margin:0}.intro>p{line-height:1.9;color:#5b6b79;font-size:15px}
  .tagline{
   font-size:14px;
   font-style:italic;
